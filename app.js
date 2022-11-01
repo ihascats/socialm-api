@@ -8,6 +8,23 @@ const indexRouter = require('./routes/index');
 
 const app = express();
 
+require('dotenv').config();
+const mongoose = require('mongoose');
+
+mongoose.connect(
+  process.env.MONGO_CONNECTION,
+  {
+    useNewUrlParser: true,
+  },
+  (err) => {
+    if (!err) {
+      console.log('MongoDB Connection Succeeded.');
+    } else {
+      console.log('Error in DB connection: ' + err);
+    }
+  },
+);
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
