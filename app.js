@@ -3,10 +3,15 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const cors = require('cors');
+const User = require('./models/User');
+const passport = require('passport');
+const session = require('express-session');
 
 const indexRouter = require('./routes/index');
 
 const app = express();
+app.use(cors());
 
 require('dotenv').config();
 const mongoose = require('mongoose');
@@ -25,6 +30,48 @@ mongoose.connect(
   },
 );
 
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: 'http://localhost:3000/auth/success',
+    },
+    async function (accessToken, refreshToken, profile, done) {
+      // Wouldn't have been able to make it work without https://github.com/DoviMaj/fakebook-server
+      let user = await User.findOne({ googleId: profile.id });
+      const userData = {
+        username: profile.displayName,
+        profile_picture: profile.photos[0].value,
+        googleId: profile.id,
+      };
+      user ? null : (user = await User.create(userData));
+      return done(null, user);
+    },
+  ),
+);
+
+passport.serializeUser(function (user, done) {
+  done(null, user.id);
+});
+
+passport.deserializeUser(function (id, done) {
+  User.findById(id, function (err, user) {
+    done(err, user);
+  });
+});
+
+app.use(
+  session({
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: true,
+  }),
+);
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
