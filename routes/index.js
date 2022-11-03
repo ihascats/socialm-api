@@ -4,6 +4,9 @@ const {
   post_signup,
   upload,
   delete_user,
+  get_login_key,
+  verifyToken,
+  get_auth_user_data,
 } = require('../controllers/index-controllers');
 const router = express.Router();
 const passport = require('passport');
@@ -14,6 +17,8 @@ router.get('/', function (req, res, next) {
 });
 
 router.get('/users', get_users);
+
+router.get('/user', verifyToken, get_auth_user_data);
 
 router.delete('/users::id', delete_user);
 
@@ -29,8 +34,10 @@ router.get(
   passport.authenticate('google', { failureRedirect: '/login' }),
   function (req, res) {
     // Successful authentication, redirect home.
-    res.redirect('/');
+    res.redirect('/login/success');
   },
 );
+
+router.get('/login/success', get_login_key);
 
 module.exports = router;
