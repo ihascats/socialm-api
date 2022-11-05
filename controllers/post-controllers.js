@@ -55,3 +55,50 @@ exports.get_user_posts = async function (req, res, next) {
     }),
   );
 };
+
+exports.get_post = async function (req, res, next) {
+  res.send(await Post.findById(req.params.id));
+};
+
+exports.put_post = async function (req, res, next) {
+  try {
+    let image =
+      'file' in req
+        ? req.file.filename
+        : 'image_url' in req.body
+        ? req.body.image_url
+        : false;
+    const { post_text } = req.body;
+    if (image) {
+      await Post.findByIdAndUpdate(req.params.id, {
+        post_text,
+        images: image,
+      }).then(async () => {
+        res.send({
+          status: 'Post information updated successfully',
+          post: await Post.findById(req.params.id),
+        });
+      });
+    } else {
+      await Post.findByIdAndUpdate(req.params.id, {
+        post_text,
+      }).then(async () => {
+        res.send({
+          status: 'Post information updated successfully',
+          post: await Post.findById(req.params.id),
+        });
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+exports.post_permission_check = async function (req, res, next) {
+  const user = await User.findOne({ posts: req.params.id });
+  user
+    ? user._id.toString() === req.authData.user._id
+      ? next()
+      : res.status(401).send('Unauthorized')
+    : res.status(404).send('Not Found');
+};
