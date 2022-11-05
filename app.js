@@ -9,6 +9,8 @@ const passport = require('passport');
 const session = require('express-session');
 
 const indexRouter = require('./routes/index');
+const userRouter = require('./routes/user');
+const googleRouter = require('./routes/google-auth');
 
 const app = express();
 app.use(cors());
@@ -79,6 +81,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
+app.use('/user', userRouter);
+app.use('/auth', googleRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
