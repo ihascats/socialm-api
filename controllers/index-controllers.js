@@ -52,6 +52,44 @@ exports.get_auth_user_data = function (req, res, next) {
   res.send(req.authData);
 };
 
+exports.get_user_data = async function (req, res, next) {
+  res.send(
+    await User.findById(req.params.id, {
+      googleId: 0,
+      admin: 0,
+    }),
+  );
+};
+
+exports.put_auth_user_data = async function (req, res, next) {
+  let image =
+    'file' in req
+      ? req.file.filename
+      : 'image_url' in req.body
+      ? req.body.image_url
+      : false;
+  if (image) {
+    User.findByIdAndUpdate(req.authData.user._id, {
+      username: req.body.username,
+      profile_picture: image,
+    }).then(async () => {
+      res.send({
+        status: 'User information updated successfully',
+        user: await User.findById(req.authData.user._id),
+      });
+    });
+  } else {
+    User.findByIdAndUpdate(req.authData.user._id, {
+      username: req.body.username,
+    }).then(async () => {
+      res.send({
+        status: 'User information updated successfully',
+        user: await User.findById(req.authData.user._id),
+      });
+    });
+  }
+};
+
 exports.post_signup = async function (req, res, next) {
   new User({
     username: req.body.username,
@@ -66,11 +104,24 @@ exports.post_signup = async function (req, res, next) {
 };
 
 exports.get_users = async function (req, res, next) {
-  res.send(await User.find());
+  res.send(
+    await User.find(
+      {},
+      {
+        googleId: 0,
+        admin: 0,
+      },
+    ),
+  );
 };
 
 exports.delete_user = function (req, res, next) {
   User.findByIdAndDelete(req.params.id).then(() => {
     res.redirect('/users');
   });
+};
+
+exports.redirect_success = function (req, res) {
+  // Successful authentication, redirect home.
+  res.redirect('/login/success');
 };
