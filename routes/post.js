@@ -9,6 +9,6 @@ const {
 
 router.post('/', verifyToken, upload.single('images'), post_new_post);
 
-router.get('/:id', get_user_posts);
+router.get('/user::id', get_user_posts);
 
 module.exports = router;

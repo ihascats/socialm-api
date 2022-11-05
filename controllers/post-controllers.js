@@ -23,7 +23,7 @@ exports.post_new_post = async (req, res, next) => {
           await User.findByIdAndUpdate(req.authData.user._id, {
             $push: { posts: newPost._id },
           });
-          res.redirect(`/post/${req.authData.user._id}`);
+          res.redirect(`/post/user:${req.authData.user._id}`);
         }
       });
     } else {
@@ -38,7 +38,7 @@ exports.post_new_post = async (req, res, next) => {
           await User.findByIdAndUpdate(req.authData.user._id, {
             $push: { posts: newPost._id },
           });
-          res.redirect(`/post/${req.authData.user._id}`);
+          res.redirect(`/post/user:${req.authData.user._id}`);
         }
       });
     }
