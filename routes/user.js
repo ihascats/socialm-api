@@ -3,6 +3,7 @@ const {
   get_auth_user_data,
   put_auth_user_data,
   delete_auth_user_data,
+  username_validate,
 } = require('../controllers/auth-user-controllers');
 const { verifyToken } = require('../controllers/jwt-controllers');
 const { upload } = require('../controllers/multer-controllers');
@@ -13,6 +14,7 @@ router.get('/', verifyToken, get_auth_user_data);
 router.put(
   '/',
   verifyToken,
+  username_validate,
   upload.single('profile_picture'),
   put_auth_user_data,
 );

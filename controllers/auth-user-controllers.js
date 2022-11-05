@@ -1,4 +1,15 @@
 const User = require('../models/User');
+const { check } = require('express-validator');
+
+exports.username_validate = [
+  check('username')
+    .isLength({ min: 2 })
+    .withMessage('Username must be at least 2 characters')
+    .isLength({ max: 20 })
+    .withMessage('Username must be at most 20 characters')
+    .trim()
+    .escape(),
+];
 
 exports.get_auth_user_data = function (req, res, next) {
   res.send(req.authData);
