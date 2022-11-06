@@ -4,7 +4,7 @@ const PostSchema = new mongoose.Schema(
   {
     author: { type: mongoose.Schema.Types.ObjectId, ref: 'users' },
     post_text: { type: String, required: true },
-    images: { type: String },
+    image: { type: String },
     replies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'posts' }],
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'users' }],
   },

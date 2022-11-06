@@ -11,7 +11,7 @@ const {
   delete_post,
 } = require('../controllers/post-controllers');
 
-router.post('/', verifyToken, upload.single('images'), post_new_post);
+router.post('/', verifyToken, upload.single('image'), post_new_post);
 
 router.get('/user::id', get_user_posts);
 
@@ -20,7 +20,7 @@ router.get('/:id', get_post);
 router.put(
   '/:id',
   verifyToken,
-  upload.single('images'),
+  upload.single('image'),
   post_permission_check,
   put_post,
 );

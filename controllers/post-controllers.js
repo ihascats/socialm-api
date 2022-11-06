@@ -14,7 +14,7 @@ exports.post_new_post = async (req, res, next) => {
       const newPost = new Post({
         author: req.authData.user._id,
         post_text,
-        images: image,
+        image,
       });
       newPost.save(async (error) => {
         if (error) {
@@ -77,7 +77,7 @@ exports.put_post = async function (req, res, next) {
     if (image) {
       await Post.findByIdAndUpdate(req.params.id, {
         post_text,
-        images: image,
+        image,
       }).then(async () => {
         res.send({
           status: 'Post information updated successfully',
