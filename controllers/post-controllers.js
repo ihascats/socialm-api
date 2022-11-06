@@ -60,6 +60,11 @@ exports.get_post = async function (req, res, next) {
   res.send(await Post.findById(req.params.id));
 };
 
+exports.delete_post = async function (req, res, next) {
+  await Post.findByIdAndDelete(req.params.id);
+  res.redirect(`/post/user:${req.authData.user._id}`);
+};
+
 exports.put_post = async function (req, res, next) {
   try {
     let image =
@@ -95,9 +100,9 @@ exports.put_post = async function (req, res, next) {
 };
 
 exports.post_permission_check = async function (req, res, next) {
-  const user = await User.findOne({ posts: req.params.id });
-  user
-    ? user._id.toString() === req.authData.user._id
+  const post = await Post.findById(req.params.id).populate('author');
+  post
+    ? post.author._id.toString() === req.authData.user._id
       ? next()
       : res.status(401).send('Unauthorized')
     : res.status(404).send('Not Found');

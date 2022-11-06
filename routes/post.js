@@ -8,9 +8,12 @@ const {
   get_post,
   put_post,
   post_permission_check,
+  delete_post,
 } = require('../controllers/post-controllers');
 
 router.post('/', verifyToken, upload.single('images'), post_new_post);
+
+router.get('/user::id', get_user_posts);
 
 router.get('/:id', get_post);
 
@@ -22,6 +25,6 @@ router.put(
   put_post,
 );
 
-router.get('/user::id', get_user_posts);
+router.delete('/:id', verifyToken, post_permission_check, delete_post);
 
 module.exports = router;
