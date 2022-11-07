@@ -61,10 +61,8 @@ exports.get_post = async function (req, res, next) {
 };
 
 exports.delete_post = async function (req, res, next) {
-  const post = await Post.findByIdAndDelete(req.params.id);
-  const author = post.author;
-  await User.findByIdAndUpdate(author, {
-    $pull: { posts: req.params.id },
+  await Post.findByIdAndUpdate(req.params.id, {
+    deleted: true,
   });
   res.redirect(`/post/user:${req.authData.user._id}`);
 };
