@@ -111,3 +111,25 @@ exports.post_permission_check = async function (req, res, next) {
       : res.status(401).send('Unauthorized')
     : res.status(404).send('Not Found');
 };
+
+exports.put_like = async function (req, res, next) {
+  const post = await Post.findById(req.params.id);
+  if (post.likes.includes(req.authData.user._id)) {
+    Post.findByIdAndUpdate(req.params.id, {
+      $pull: { likes: req.authData.user._id },
+    }).then(async () => {
+      await User.findByIdAndUpdate(req.authData.user._id, {
+        $pull: { likes: req.params.id },
+      });
+    });
+  } else {
+    Post.findByIdAndUpdate(req.params.id, {
+      $push: { likes: req.authData.user._id },
+    }).then(async () => {
+      await User.findByIdAndUpdate(req.authData.user._id, {
+        $push: { likes: req.params.id },
+      });
+    });
+  }
+  res.send({ likeCount: (await Post.findById(req.params.id)).likes.length });
+};

@@ -9,12 +9,14 @@ const {
   put_post,
   post_permission_check,
   delete_post,
-  post_like,
+  put_like,
 } = require('../controllers/post-controllers');
 
 router.post('/', verifyToken, upload.single('image'), post_new_post);
 
 router.get('/user::id', get_user_posts);
+
+router.put('/like::id', verifyToken, put_like);
 
 router.get('/:id', get_post);
 
