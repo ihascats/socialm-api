@@ -9,6 +9,7 @@ const {
   put_post,
   post_permission_check,
   delete_post,
+  post_like,
 } = require('../controllers/post-controllers');
 
 router.post('/', verifyToken, upload.single('image'), post_new_post);
