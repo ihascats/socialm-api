@@ -8,22 +8,16 @@ exports.post_new_post = async (req, res, next) => {
         : 'image_url' in req.body
         ? req.body.image_url
         : undefined;
-    const { post_text, parent } = req.body;
+    const { post_text } = req.body;
     const newPost = new Post({
       author: req.authData.user._id,
       post_text,
       image,
-      parent,
     });
     newPost.save(async (error) => {
       if (error) {
         return next(error);
       } else {
-        if (parent) {
-          await Post.findByIdAndUpdate(parent, {
-            $push: { replies: newPost._id },
-          });
-        }
         res.redirect(`/post/user:${req.authData.user._id}`);
       }
     });
