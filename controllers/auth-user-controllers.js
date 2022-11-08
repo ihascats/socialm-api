@@ -45,8 +45,32 @@ exports.put_auth_user_data = async function (req, res, next) {
 };
 
 exports.delete_auth_user_data = function (req, res, next) {
-  console.log(1);
   User.findByIdAndDelete(req.authData.user._id).then(() => {
     res.redirect('/users');
   });
+};
+
+exports.put_friend_request = async function (req, res, next) {
+  await User.findByIdAndUpdate(req.params.id, {
+    $push: { friend_requests: req.authData.user._id },
+  });
+  res.status(200).send({ status: 'Friend Request Sent' });
+};
+
+exports.put_accept_friend_request = async function (req, res, next) {
+  await User.findByIdAndUpdate(req.params.id, {
+    $push: { friends_list: req.authData.user._id },
+  });
+  await User.findByIdAndUpdate(req.authData.user._id, {
+    $push: { friends_list: req.params.id },
+    $pull: { friend_requests: req.params.id },
+  });
+  res.send(`/users:${req.authData.user._id}`);
+};
+
+exports.put_decline_friend_request = async function (req, res, next) {
+  await User.findByIdAndUpdate(req.authData.user._id, {
+    $pull: { friend_requests: req.params.id },
+  });
+  res.send(`/users:${req.authData.user._id}`);
 };

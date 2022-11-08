@@ -5,6 +5,7 @@ const UserSchema = new mongoose.Schema({
   googleId: {},
   profile_picture: { type: String, default: 'no-image.png' },
   friends_list: [{ type: mongoose.Schema.Types.ObjectId, ref: 'users' }],
+  friend_requests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'users' }],
   admin: { type: Boolean, default: false },
 });
 
