@@ -7,10 +7,9 @@ const CommentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'posts',
     },
-    post_text: { type: String, required: true },
+    comment_text: { type: String, required: true },
     image: { type: String },
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'users' }],
-    deleted: { type: Boolean, default: false },
   },
 
   {

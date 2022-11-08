@@ -7,7 +7,6 @@ const PostSchema = new mongoose.Schema(
     image: { type: String },
     replies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'posts' }],
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'users' }],
-    deleted: { type: Boolean, default: false },
   },
 
   {

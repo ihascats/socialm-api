@@ -1,4 +1,5 @@
 const Post = require('../models/Posts');
+const Comment = require('../models/Comments');
 
 exports.post_new_post = async (req, res, next) => {
   try {
@@ -35,9 +36,8 @@ exports.get_post = async function (req, res, next) {
 };
 
 exports.delete_post = async function (req, res, next) {
-  await Post.findByIdAndUpdate(req.params.id, {
-    deleted: true,
-  });
+  await Post.findByIdAndDelete(req.params.id);
+  await Comment.deleteMany({ parent: req.params.id });
   res.redirect(`/post/user:${req.authData.user._id}`);
 };
 
@@ -89,4 +89,35 @@ exports.put_like = async function (req, res, next) {
     });
   }
   res.send({ likeCount: (await Post.findById(req.params.id)).likes.length });
+};
+
+exports.post_comment = async function (req, res, next) {
+  try {
+    let image =
+      'file' in req
+        ? req.file.filename
+        : 'image_url' in req.body
+        ? req.body.image_url
+        : undefined;
+    const { comment_text } = req.body;
+    const parent = req.params.id;
+    const newComment = new Comment({
+      author: req.authData.user._id,
+      parent,
+      comment_text,
+      image,
+    });
+    newComment.save(async (error, value) => {
+      if (error) {
+        return next(error);
+      } else {
+        await Post.findByIdAndUpdate(req.params.id, {
+          $push: { replies: await value._id },
+        });
+        res.redirect(`/post/user:${req.authData.user._id}`);
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };

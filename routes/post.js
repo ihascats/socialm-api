@@ -10,7 +10,10 @@ const {
   post_permission_check,
   delete_post,
   put_like,
+  post_comment,
 } = require('../controllers/post-controllers');
+
+router.post('/comment::id', verifyToken, upload.single('image'), post_comment);
 
 router.post('/', verifyToken, upload.single('image'), post_new_post);
 
