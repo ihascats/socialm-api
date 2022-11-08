@@ -14,6 +14,7 @@ const {
   put_like,
   post_comment,
   put_comment,
+  put_comment_like,
 } = require('../controllers/post-controllers');
 
 router.post('/comment::id', verifyToken, upload.single('image'), post_comment);
@@ -24,6 +25,8 @@ router.delete(
   comment_permission_check,
   delete_comment,
 );
+
+router.put('/comment/like::id', verifyToken, put_comment_like);
 
 router.put(
   '/comment/:id',

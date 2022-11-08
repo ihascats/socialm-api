@@ -116,7 +116,7 @@ exports.delete_comment = async function (req, res, next) {
 
 exports.put_like = async function (req, res, next) {
   const post = await Post.findById(req.params.id);
-  if (post.deleted) {
+  if (!post) {
     res.status(404).send('Not Found');
     return;
   }
@@ -130,6 +130,24 @@ exports.put_like = async function (req, res, next) {
     });
   }
   res.send({ likeCount: (await Post.findById(req.params.id)).likes.length });
+};
+
+exports.put_comment_like = async function (req, res, next) {
+  const comment = await Comment.findById(req.params.id);
+  if (!comment) {
+    res.status(404).send('Not Found');
+    return;
+  }
+  if (comment.likes.includes(req.authData.user._id)) {
+    await Comment.findByIdAndUpdate(req.params.id, {
+      $pull: { likes: req.authData.user._id },
+    });
+  } else {
+    await Comment.findByIdAndUpdate(req.params.id, {
+      $push: { likes: req.authData.user._id },
+    });
+  }
+  res.send({ likeCount: (await Comment.findById(req.params.id)).likes.length });
 };
 
 exports.post_comment = async function (req, res, next) {
