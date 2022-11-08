@@ -27,12 +27,19 @@ exports.post_new_post = async (req, res, next) => {
   }
 };
 
-exports.get_user_posts = async function (req, res, next) {
-  res.send(await Post.find({ author: req.params.id }));
+exports.get_user_posts_comments = async function (req, res, next) {
+  res.send({
+    posts: await Post.find({ author: req.params.id }),
+    comments: await Comment.find({ author: req.params.id }),
+  });
 };
 
 exports.get_post = async function (req, res, next) {
   res.send(await Post.findById(req.params.id));
+};
+
+exports.get_comment = async function (req, res, next) {
+  res.send(await Comment.findById(req.params.id));
 };
 
 exports.delete_post = async function (req, res, next) {

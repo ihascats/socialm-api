@@ -4,7 +4,7 @@ const { upload } = require('../controllers/multer-controllers');
 const router = express.Router();
 const {
   post_new_post,
-  get_user_posts,
+  get_user_posts_comments,
   get_post,
   put_post,
   post_permission_check,
@@ -15,9 +15,12 @@ const {
   post_comment,
   put_comment,
   put_comment_like,
+  get_comment,
 } = require('../controllers/post-controllers');
 
 router.post('/comment::id', verifyToken, upload.single('image'), post_comment);
+
+router.get('/comment:id', get_comment);
 
 router.delete(
   '/comment/:id',
@@ -38,7 +41,7 @@ router.put(
 
 router.post('/', verifyToken, upload.single('image'), post_new_post);
 
-router.get('/user::id', get_user_posts);
+router.get('/user::id', get_user_posts_comments);
 
 router.put('/like::id', verifyToken, put_like);
 
