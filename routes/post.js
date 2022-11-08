@@ -13,6 +13,7 @@ const {
   delete_comment,
   put_like,
   post_comment,
+  put_comment,
 } = require('../controllers/post-controllers');
 
 router.post('/comment::id', verifyToken, upload.single('image'), post_comment);
@@ -22,6 +23,14 @@ router.delete(
   verifyToken,
   comment_permission_check,
   delete_comment,
+);
+
+router.put(
+  '/comment/:id',
+  verifyToken,
+  upload.single('image'),
+  comment_permission_check,
+  put_comment,
 );
 
 router.post('/', verifyToken, upload.single('image'), post_new_post);

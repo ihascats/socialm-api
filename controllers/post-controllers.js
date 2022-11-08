@@ -64,6 +64,29 @@ exports.put_post = async function (req, res, next) {
   }
 };
 
+exports.put_comment = async function (req, res, next) {
+  try {
+    let image =
+      'file' in req
+        ? req.file.filename
+        : 'image_url' in req.body
+        ? req.body.image_url
+        : undefined;
+    const { comment_text } = req.body;
+    await Comment.findByIdAndUpdate(req.params.id, {
+      comment_text,
+      image,
+    }).then(async () => {
+      res.send({
+        status: 'Comment information updated successfully',
+        comment: await Comment.findById(req.params.id),
+      });
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 exports.post_permission_check = async function (req, res, next) {
   const post = await Post.findById(req.params.id).populate('author');
   post
