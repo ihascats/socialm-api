@@ -5,10 +5,7 @@ exports.get_user_data = async function (req, res, next) {
     await User.findById(req.params.id, {
       googleId: 0,
       admin: 0,
-    })
-      .populate({ path: 'posts', match: { deleted: false } })
-      .populate({ path: 'likes', match: { deleted: false } })
-      .populate({ path: 'comments', match: { deleted: false } }),
+    }),
   );
 };
 

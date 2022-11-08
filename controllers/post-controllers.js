@@ -1,5 +1,4 @@
 const Post = require('../models/Posts');
-const User = require('../models/User');
 
 exports.post_new_post = async (req, res, next) => {
   try {
@@ -20,9 +19,6 @@ exports.post_new_post = async (req, res, next) => {
       if (error) {
         return next(error);
       } else {
-        await User.findByIdAndUpdate(req.authData.user._id, {
-          $push: { posts: newPost._id },
-        });
         if (parent) {
           await Post.findByIdAndUpdate(parent, {
             $push: { replies: newPost._id },
@@ -37,12 +33,7 @@ exports.post_new_post = async (req, res, next) => {
 };
 
 exports.get_user_posts = async function (req, res, next) {
-  res.send(
-    await User.findById(req.params.id, { posts: 1 }).populate({
-      path: 'posts',
-      options: { sort: { createdAt: -1 } },
-    }),
-  );
+  res.send(await Post.find({ author: req.params.id }));
 };
 
 exports.get_post = async function (req, res, next) {
@@ -95,20 +86,12 @@ exports.put_like = async function (req, res, next) {
     return;
   }
   if (post.likes.includes(req.authData.user._id)) {
-    Post.findByIdAndUpdate(req.params.id, {
+    await Post.findByIdAndUpdate(req.params.id, {
       $pull: { likes: req.authData.user._id },
-    }).then(async () => {
-      await User.findByIdAndUpdate(req.authData.user._id, {
-        $pull: { likes: req.params.id },
-      });
     });
   } else {
-    Post.findByIdAndUpdate(req.params.id, {
+    await Post.findByIdAndUpdate(req.params.id, {
       $push: { likes: req.authData.user._id },
-    }).then(async () => {
-      await User.findByIdAndUpdate(req.authData.user._id, {
-        $push: { likes: req.params.id },
-      });
     });
   }
   res.send({ likeCount: (await Post.findById(req.params.id)).likes.length });
