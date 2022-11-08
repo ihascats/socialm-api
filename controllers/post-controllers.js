@@ -8,40 +8,29 @@ exports.post_new_post = async (req, res, next) => {
         ? req.file.filename
         : 'image_url' in req.body
         ? req.body.image_url
-        : false;
-    const { post_text } = req.body;
-    if (image) {
-      const newPost = new Post({
-        author: req.authData.user._id,
-        post_text,
-        image,
-      });
-      newPost.save(async (error) => {
-        if (error) {
-          return next(error);
-        } else {
-          await User.findByIdAndUpdate(req.authData.user._id, {
-            $push: { posts: newPost._id },
+        : undefined;
+    const { post_text, parent } = req.body;
+    const newPost = new Post({
+      author: req.authData.user._id,
+      post_text,
+      image,
+      parent,
+    });
+    newPost.save(async (error) => {
+      if (error) {
+        return next(error);
+      } else {
+        await User.findByIdAndUpdate(req.authData.user._id, {
+          $push: { posts: newPost._id },
+        });
+        if (parent) {
+          await Post.findByIdAndUpdate(parent, {
+            $push: { replies: newPost._id },
           });
-          res.redirect(`/post/user:${req.authData.user._id}`);
         }
-      });
-    } else {
-      const newPost = new Post({
-        author: req.authData.user._id,
-        post_text,
-      });
-      newPost.save(async (error) => {
-        if (error) {
-          return next(error);
-        } else {
-          await User.findByIdAndUpdate(req.authData.user._id, {
-            $push: { posts: newPost._id },
-          });
-          res.redirect(`/post/user:${req.authData.user._id}`);
-        }
-      });
-    }
+        res.redirect(`/post/user:${req.authData.user._id}`);
+      }
+    });
   } catch (error) {
     console.log(error);
   }
@@ -74,28 +63,17 @@ exports.put_post = async function (req, res, next) {
         ? req.file.filename
         : 'image_url' in req.body
         ? req.body.image_url
-        : false;
+        : undefined;
     const { post_text } = req.body;
-    if (image) {
-      await Post.findByIdAndUpdate(req.params.id, {
-        post_text,
-        image,
-      }).then(async () => {
-        res.send({
-          status: 'Post information updated successfully',
-          post: await Post.findById(req.params.id),
-        });
+    await Post.findByIdAndUpdate(req.params.id, {
+      post_text,
+      image,
+    }).then(async () => {
+      res.send({
+        status: 'Post information updated successfully',
+        post: await Post.findById(req.params.id),
       });
-    } else {
-      await Post.findByIdAndUpdate(req.params.id, {
-        post_text,
-      }).then(async () => {
-        res.send({
-          status: 'Post information updated successfully',
-          post: await Post.findById(req.params.id),
-        });
-      });
-    }
+    });
   } catch (error) {
     console.log(error);
   }
