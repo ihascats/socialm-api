@@ -8,12 +8,21 @@ const {
   get_post,
   put_post,
   post_permission_check,
+  comment_permission_check,
   delete_post,
+  delete_comment,
   put_like,
   post_comment,
 } = require('../controllers/post-controllers');
 
 router.post('/comment::id', verifyToken, upload.single('image'), post_comment);
+
+router.delete(
+  '/comment/:id',
+  verifyToken,
+  comment_permission_check,
+  delete_comment,
+);
 
 router.post('/', verifyToken, upload.single('image'), post_new_post);
 

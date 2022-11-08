@@ -73,6 +73,24 @@ exports.post_permission_check = async function (req, res, next) {
     : res.status(404).send('Not Found');
 };
 
+exports.comment_permission_check = async function (req, res, next) {
+  const comment = await Comment.findById(req.params.id).populate('author');
+  comment
+    ? comment.author._id.toString() === req.authData.user._id
+      ? next()
+      : res.status(401).send('Unauthorized')
+    : res.status(404).send('Not Found');
+};
+
+exports.delete_comment = async function (req, res, next) {
+  const comment = await Comment.findByIdAndDelete(req.params.id);
+  const post = comment.parent;
+  await Post.findByIdAndUpdate(post, {
+    $pull: { replies: req.params.id },
+  });
+  res.redirect(`/post/user:${req.authData.user._id}`);
+};
+
 exports.put_like = async function (req, res, next) {
   const post = await Post.findById(req.params.id);
   if (post.deleted) {
