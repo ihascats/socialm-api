@@ -112,6 +112,10 @@ exports.post_permission_check = async function (req, res, next) {
 
 exports.put_like = async function (req, res, next) {
   const post = await Post.findById(req.params.id);
+  if (post.deleted) {
+    res.status(404).send('Not Found');
+    return;
+  }
   if (post.likes.includes(req.authData.user._id)) {
     Post.findByIdAndUpdate(req.params.id, {
       $pull: { likes: req.authData.user._id },
