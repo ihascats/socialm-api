@@ -20,7 +20,7 @@ const {
 
 router.post('/comment::id', verifyToken, upload.single('image'), post_comment);
 
-router.get('/comment:id', get_comment);
+router.get('/comment::id', get_comment);
 
 router.delete(
   '/comment/:id',
