@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Post = require('../models/Posts');
 
 exports.get_user_data = async function (req, res, next) {
   res.send(
@@ -31,5 +32,17 @@ exports.get_users = async function (req, res, next) {
         profile_picture: 1,
       },
     ),
+  );
+};
+
+exports.get_timeline = async function (req, res, next) {
+  const user = await User.findById(req.authData.user._id, { friends_list: 1 });
+  user.friends_list.push({ _id: req.authData.user._id });
+  res.send(
+    await Post.find({
+      author: {
+        $in: user.friends_list,
+      },
+    }).sort({ createdAt: -1 }),
   );
 };
