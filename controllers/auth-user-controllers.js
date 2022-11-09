@@ -87,3 +87,16 @@ exports.put_decline_friend_request = async function (req, res, next) {
   });
   res.send(`/users:${req.authData.user._id}`);
 };
+
+exports.request_check = async function (req, res, next) {
+  const nonFriend = await User.findById(req.params.id);
+  if (
+    nonFriend.friends_list.includes(req.authData.user._id) ||
+    nonFriend.friend_requests.includes(req.authData.user._id) ||
+    req.params.id === req.authData.user._id
+  ) {
+    res.send("Can't Send Request");
+  } else {
+    next();
+  }
+};
