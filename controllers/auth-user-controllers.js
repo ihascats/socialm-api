@@ -68,6 +68,19 @@ exports.put_accept_friend_request = async function (req, res, next) {
   res.send(`/users:${req.authData.user._id}`);
 };
 
+exports.get_friend_requests = async function (req, res, next) {
+  res.send(
+    await User.findById(req.authData.user._id, { friend_requests: 1 })
+      .sort({
+        createdAt: -1,
+      })
+      .populate({
+        path: 'friend_requests',
+        select: ['username', 'profile_picture'],
+      }),
+  );
+};
+
 exports.put_decline_friend_request = async function (req, res, next) {
   await User.findByIdAndUpdate(req.authData.user._id, {
     $pull: { friend_requests: req.params.id },
