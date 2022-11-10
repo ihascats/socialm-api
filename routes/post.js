@@ -18,9 +18,9 @@ const {
   get_comment,
 } = require('../controllers/post-controllers');
 
-router.post('/comment::id', verifyToken, upload.single('image'), post_comment);
+router.post('/:id/comment', verifyToken, upload.single('image'), post_comment);
 
-router.get('/comment::id', get_comment);
+router.get('/comment/:id', get_comment);
 
 router.delete(
   '/comment/:id',
@@ -29,7 +29,7 @@ router.delete(
   delete_comment,
 );
 
-router.put('/comment/like::id', verifyToken, put_comment_like);
+router.put('/comment/:id/like', verifyToken, put_comment_like);
 
 router.put(
   '/comment/:id',
@@ -41,9 +41,9 @@ router.put(
 
 router.post('/', verifyToken, upload.single('image'), post_new_post);
 
-router.get('/user::id', get_user_posts_comments);
+router.get('/user/:id', get_user_posts_comments);
 
-router.put('/like::id', verifyToken, put_like);
+router.put('/:id/like', verifyToken, put_like);
 
 router.get('/:id', get_post);
 

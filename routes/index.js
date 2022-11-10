@@ -18,22 +18,22 @@ router.get('/', function (req, res, next) {
       '/users:<user_id> | gets a single user',
       '/auth/google | sign in/up with google',
       '/post/<post_id> | get a single post',
-      '/post/comment:<comment_id> | get a single comment',
-      '/post/user:<user_id> | get posts made by user',
+      '/post/comment/<comment_id> | get a single comment',
+      '/post/user/<user_id> | get posts made by user',
     ],
     post: [
       '/post | create a new post',
-      '/post/comment:<post_id> | create a new comment',
+      '/post/<post_id>/comment | create a new comment',
     ],
     put: [
       '/user | update currently signed in user info',
       '/post/<post_id> | update post',
-      '/post/like:<post_id> | add/remove like on a post',
-      '/post/comment/:<comment_id> | update comment',
-      '/post/comment/like:<comment_id> | add/remove like on a comment',
-      '/fr:<user_id> | make a friend request',
-      '/accept_fr:<user_id> | accept a friend request',
-      '/decline_fr:<user_id> | decline a friend request',
+      '/post/<post_id>/like | add/remove like on a post',
+      '/post/comment/<comment_id> | update comment',
+      '/post/comment/<comment_id>/like | add/remove like on a comment',
+      '/user/<user_id>/fr | make a friend request',
+      '/user/accept_fr/<user_id> | accept a friend request',
+      '/user/decline_fr/<user_id> | decline a friend request',
     ],
     delete: [
       '/user | delete currently signed in user',
@@ -47,6 +47,6 @@ router.get('/timeline', verifyToken, get_timeline);
 
 router.get('/users', get_users);
 
-router.get('/users::id', get_user_data);
+router.get('/users/:id', get_user_data);
 
 module.exports = router;
