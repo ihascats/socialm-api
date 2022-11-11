@@ -19,7 +19,7 @@ exports.post_new_post = async (req, res, next) => {
       if (error) {
         return next(error);
       } else {
-        res.redirect(`/post/user:${req.authData.user._id}`);
+        res.redirect(`/post/user/${req.authData.user._id}`);
       }
     });
   } catch (error) {
@@ -29,8 +29,8 @@ exports.post_new_post = async (req, res, next) => {
 
 exports.get_user_posts_comments = async function (req, res, next) {
   res.send({
-    posts: await Post.find({ author: req.params.id }),
-    comments: await Comment.find({ author: req.params.id }),
+    posts: await Post.find({ author: req.params.id }).populate('author'),
+    comments: await Comment.find({ author: req.params.id }).populate('author'),
   });
 };
 
@@ -45,7 +45,7 @@ exports.get_comment = async function (req, res, next) {
 exports.delete_post = async function (req, res, next) {
   await Post.findByIdAndDelete(req.params.id);
   await Comment.deleteMany({ parent: req.params.id });
-  res.redirect(`/post/user:${req.authData.user._id}`);
+  res.redirect(`/post/user/${req.authData.user._id}`);
 };
 
 exports.put_post = async function (req, res, next) {
@@ -118,7 +118,7 @@ exports.delete_comment = async function (req, res, next) {
   await Post.findByIdAndUpdate(post, {
     $pull: { replies: req.params.id },
   });
-  res.redirect(`/post/user:${req.authData.user._id}`);
+  res.redirect(`/post/user/${req.authData.user._id}`);
 };
 
 exports.put_like = async function (req, res, next) {
@@ -180,7 +180,7 @@ exports.post_comment = async function (req, res, next) {
         await Post.findByIdAndUpdate(req.params.id, {
           $push: { replies: await value._id },
         });
-        res.redirect(`/post/user:${req.authData.user._id}`);
+        res.redirect(`/post/user/${req.authData.user._id}`);
       }
     });
   } catch (error) {

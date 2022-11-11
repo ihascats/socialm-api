@@ -11,8 +11,8 @@ exports.username_validate = [
     .escape(),
 ];
 
-exports.get_auth_user_data = function (req, res, next) {
-  res.send(req.authData);
+exports.get_auth_user_data = async function (req, res, next) {
+  res.send(await User.findById(req.authData.user._id, { googleId: 0 }));
 };
 
 exports.put_auth_user_data = async function (req, res, next) {
