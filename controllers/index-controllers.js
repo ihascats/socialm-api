@@ -43,6 +43,8 @@ exports.get_timeline = async function (req, res, next) {
       author: {
         $in: user.friends_list,
       },
-    }).sort({ createdAt: -1 }),
+    })
+      .sort({ createdAt: -1 })
+      .populate('author'),
   );
 };

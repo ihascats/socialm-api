@@ -29,8 +29,12 @@ exports.post_new_post = async (req, res, next) => {
 
 exports.get_user_posts_comments = async function (req, res, next) {
   res.send({
-    posts: await Post.find({ author: req.params.id }).populate('author'),
-    comments: await Comment.find({ author: req.params.id }).populate('author'),
+    posts: await Post.find({ author: req.params.id })
+      .sort({ createdAt: -1 })
+      .populate('author'),
+    comments: await Comment.find({ author: req.params.id })
+      .sort({ createdAt: -1 })
+      .populate('author'),
   });
 };
 
