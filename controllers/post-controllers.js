@@ -39,7 +39,17 @@ exports.get_user_posts_comments = async function (req, res, next) {
 };
 
 exports.get_post = async function (req, res, next) {
-  res.send(await Post.findById(req.params.id).populate('replies'));
+  res.send(
+    await Post.findById(req.params.id)
+      .populate({
+        path: 'replies',
+        populate: {
+          path: 'author',
+          select: 'username profile_picture',
+        },
+      })
+      .populate('author', 'username profile_picture'),
+  );
 };
 
 exports.get_comment = async function (req, res, next) {
