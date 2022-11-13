@@ -51,10 +51,15 @@ exports.delete_auth_user_data = function (req, res, next) {
 };
 
 exports.put_friend_request = async function (req, res, next) {
-  await User.findByIdAndUpdate(req.params.id, {
-    $push: { friend_requests: req.authData.user._id },
-  });
-  res.status(200).send({ status: 'Friend Request Sent' });
+  const authUser = await User.findById(req.authData.user._id);
+  if (authUser.friend_requests.includes(req.params.id)) {
+    res.redirect(`/user/accept_fr/${req.params.id}`);
+  } else {
+    await User.findByIdAndUpdate(req.params.id, {
+      $push: { friend_requests: req.authData.user._id },
+    });
+    res.status(200).send({ status: 'Friend Request Sent' });
+  }
 };
 
 exports.put_accept_friend_request = async function (req, res, next) {
@@ -65,7 +70,17 @@ exports.put_accept_friend_request = async function (req, res, next) {
     $push: { friends_list: req.params.id },
     $pull: { friend_requests: req.params.id },
   });
-  res.send(`/users:${req.authData.user._id}`);
+  res.send({ user: await User.findById(req.authData.user._id) });
+};
+
+exports.put_remove_friend = async function (req, res, next) {
+  await User.findByIdAndUpdate(req.params.id, {
+    $pull: { friends_list: req.authData.user._id },
+  });
+  await User.findByIdAndUpdate(req.authData.user._id, {
+    $pull: { friends_list: req.params.id },
+  });
+  res.send({ user: await User.findById(req.authData.user._id) });
 };
 
 exports.get_friend_requests = async function (req, res, next) {
@@ -85,7 +100,7 @@ exports.put_decline_friend_request = async function (req, res, next) {
   await User.findByIdAndUpdate(req.authData.user._id, {
     $pull: { friend_requests: req.params.id },
   });
-  res.send(`/users:${req.authData.user._id}`);
+  res.send({ user: await User.findById(req.authData.user._id) });
 };
 
 exports.request_check = async function (req, res, next) {

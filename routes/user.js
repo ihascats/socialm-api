@@ -9,6 +9,7 @@ const {
   put_decline_friend_request,
   get_friend_requests,
   request_check,
+  put_remove_friend,
 } = require('../controllers/auth-user-controllers');
 const { verifyToken } = require('../controllers/jwt-controllers');
 const { upload } = require('../controllers/multer-controllers');
@@ -23,6 +24,8 @@ router.put('/:id/fr', verifyToken, request_check, put_friend_request);
 router.put('/accept_fr/:id', verifyToken, put_accept_friend_request);
 
 router.put('/decline_fr/:id', verifyToken, put_decline_friend_request);
+
+router.put('/remove_fr/:id', verifyToken, put_remove_friend);
 
 router.put(
   '/',
