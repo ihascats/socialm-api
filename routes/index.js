@@ -3,6 +3,7 @@ const {
   get_users,
   get_user_data,
   get_timeline,
+  get_image,
 } = require('../controllers/index-controllers');
 const { verifyToken } = require('../controllers/jwt-controllers');
 const router = express.Router();
@@ -44,6 +45,8 @@ router.get('/', function (req, res, next) {
 });
 
 router.get('/timeline', verifyToken, get_timeline);
+
+router.get('/img/:id', get_image);
 
 router.get('/users', get_users);
 
