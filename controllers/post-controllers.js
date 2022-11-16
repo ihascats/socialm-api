@@ -77,7 +77,15 @@ exports.put_post = async function (req, res, next) {
     }).then(async () => {
       res.send({
         status: 'Post information updated successfully',
-        post: await Post.findById(req.params.id),
+        post: await Post.findById(req.params.id)
+          .populate({
+            path: 'replies',
+            populate: {
+              path: 'author',
+              select: 'username profile_picture',
+            },
+          })
+          .populate('author', 'username profile_picture'),
       });
     });
   } catch (error) {
