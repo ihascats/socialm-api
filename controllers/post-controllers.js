@@ -74,8 +74,15 @@ exports.delete_post = async function (req, res, next) {
         .sort({ createdAt: -1 })
         .populate('author'),
     );
-  } else {
-    res.redirect(`/post/user/${req.authData.user._id}`);
+  } else if (req.params.path === 'user') {
+    res.send({
+      posts: await Post.find({ author: req.authData.user._id })
+        .sort({ createdAt: -1 })
+        .populate('author'),
+      comments: await Comment.find({ author: req.authData.user._id })
+        .sort({ createdAt: -1 })
+        .populate('author'),
+    });
   }
 };
 
