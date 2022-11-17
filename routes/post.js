@@ -55,6 +55,6 @@ router.put(
   put_post,
 );
 
-router.delete('/:id', verifyToken, post_permission_check, delete_post);
+router.delete('/:id/:path', verifyToken, post_permission_check, delete_post);
 
 module.exports = router;

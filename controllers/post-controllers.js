@@ -1,5 +1,6 @@
 const Post = require('../models/Posts');
 const Comment = require('../models/Comments');
+const User = require('../models/User');
 
 exports.post_new_post = async (req, res, next) => {
   try {
@@ -59,7 +60,23 @@ exports.get_comment = async function (req, res, next) {
 exports.delete_post = async function (req, res, next) {
   await Post.findByIdAndDelete(req.params.id);
   await Comment.deleteMany({ parent: req.params.id });
-  res.redirect(`/post/user/${req.authData.user._id}`);
+  if (req.params.path === 'timeline') {
+    const user = await User.findById(req.authData.user._id, {
+      friends_list: 1,
+    });
+    user.friends_list.push({ _id: req.authData.user._id });
+    res.send(
+      await Post.find({
+        author: {
+          $in: user.friends_list,
+        },
+      })
+        .sort({ createdAt: -1 })
+        .populate('author'),
+    );
+  } else {
+    res.redirect(`/post/user/${req.authData.user._id}`);
+  }
 };
 
 exports.put_post = async function (req, res, next) {
