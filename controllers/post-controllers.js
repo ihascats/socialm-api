@@ -226,7 +226,7 @@ exports.post_comment = async function (req, res, next) {
         await Post.findByIdAndUpdate(req.params.id, {
           $push: { replies: await value._id },
         });
-        res.redirect(`/post/user/${req.authData.user._id}`);
+        res.redirect(`/post/${req.params.id}`);
       }
     });
   } catch (error) {
