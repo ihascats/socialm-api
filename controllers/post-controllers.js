@@ -164,7 +164,27 @@ exports.delete_comment = async function (req, res, next) {
   await Post.findByIdAndUpdate(post, {
     $pull: { replies: req.params.id },
   });
-  res.redirect(`/post/user/${req.authData.user._id}`);
+  if (req.params.path === 'post')
+    res.send(
+      await Post.findById(post)
+        .populate({
+          path: 'replies',
+          populate: {
+            path: 'author',
+            select: 'username profile_picture',
+          },
+        })
+        .populate('author', 'username profile_picture'),
+    );
+  if (req.params.path === 'user')
+    res.send({
+      posts: await Post.find({ author: req.authData.user._id })
+        .sort({ createdAt: -1 })
+        .populate('author'),
+      comments: await Comment.find({ author: req.authData.user._id })
+        .sort({ createdAt: -1 })
+        .populate('author'),
+    });
 };
 
 exports.put_like = async function (req, res, next) {

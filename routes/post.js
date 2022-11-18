@@ -23,7 +23,7 @@ router.post('/:id/comment', verifyToken, upload.single('image'), post_comment);
 router.get('/comment/:id', get_comment);
 
 router.delete(
-  '/comment/:id',
+  '/comment/:id/:path',
   verifyToken,
   comment_permission_check,
   delete_comment,
