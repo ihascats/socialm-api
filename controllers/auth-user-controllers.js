@@ -58,7 +58,10 @@ exports.put_friend_request = async function (req, res, next) {
     await User.findByIdAndUpdate(req.params.id, {
       $push: { friend_requests: req.authData.user._id },
     });
-    res.status(200).send({ status: 'Friend Request Sent' });
+    res.status(200).send({
+      status: 'Friend Request Sent',
+      user: await User.findById(req.authData.user._id),
+    });
   }
 };
 
