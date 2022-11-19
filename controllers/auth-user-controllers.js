@@ -99,6 +99,21 @@ exports.get_friend_requests = async function (req, res, next) {
   );
 };
 
+exports.get_outgoing_friend_requests = async function (req, res, next) {
+  res.send(
+    await User.find({
+      friend_requests: req.authData.user._id,
+    })
+      .sort({
+        createdAt: -1,
+      })
+      .populate({
+        path: 'friend_requests',
+        select: ['username', 'profile_picture'],
+      }),
+  );
+};
+
 exports.put_decline_friend_request = async function (req, res, next) {
   await User.findByIdAndUpdate(req.authData.user._id, {
     $pull: { friend_requests: req.params.id },

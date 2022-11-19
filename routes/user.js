@@ -10,6 +10,7 @@ const {
   get_friend_requests,
   request_check,
   put_remove_friend,
+  get_outgoing_friend_requests,
 } = require('../controllers/auth-user-controllers');
 const { verifyToken } = require('../controllers/jwt-controllers');
 const { upload } = require('../controllers/multer-controllers');
@@ -18,6 +19,8 @@ const router = express.Router();
 router.get('/', verifyToken, get_auth_user_data);
 
 router.get('/friend_requests', verifyToken, get_friend_requests);
+
+router.get('/outgoingFr', verifyToken, get_outgoing_friend_requests);
 
 router.put('/:id/fr', verifyToken, request_check, put_friend_request);
 
