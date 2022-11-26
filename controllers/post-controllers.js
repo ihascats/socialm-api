@@ -1,6 +1,7 @@
 const Post = require('../models/Posts');
 const Comment = require('../models/Comments');
 const User = require('../models/User');
+const path = require('path');
 
 exports.post_new_post = async (req, res, next) => {
   try {
@@ -25,6 +26,24 @@ exports.post_new_post = async (req, res, next) => {
     });
   } catch (error) {
     console.log(error);
+  }
+};
+
+exports.get_post_image = async function (req, res, next) {
+  const imgFile = await Post.findById(req.params.id, {
+    image: 1,
+  });
+  if ('image' in imgFile) {
+    const newPath = path.join(
+      __dirname,
+      '..',
+      'public',
+      'images',
+      imgFile.image,
+    );
+    res.sendFile(newPath);
+  } else {
+    res.send(null);
   }
 };
 

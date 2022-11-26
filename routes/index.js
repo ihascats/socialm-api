@@ -6,6 +6,7 @@ const {
   get_image,
 } = require('../controllers/index-controllers');
 const { verifyToken } = require('../controllers/jwt-controllers');
+const { get_post_image } = require('../controllers/post-controllers');
 const router = express.Router();
 
 /* GET home page. */
@@ -45,6 +46,8 @@ router.get('/', function (req, res, next) {
 });
 
 router.get('/timeline', verifyToken, get_timeline);
+
+router.get('/post/img/:id', get_post_image);
 
 router.get('/img/:id', get_image);
 
