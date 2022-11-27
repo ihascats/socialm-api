@@ -47,6 +47,24 @@ exports.get_post_image = async function (req, res, next) {
   }
 };
 
+exports.get_comment_image = async function (req, res, next) {
+  const imgFile = await Comment.findById(req.params.id, {
+    image: 1,
+  });
+  if ('image' in imgFile) {
+    const newPath = path.join(
+      __dirname,
+      '..',
+      'public',
+      'images',
+      imgFile.image,
+    );
+    res.sendFile(newPath);
+  } else {
+    res.send(null);
+  }
+};
+
 exports.get_user_posts_comments = async function (req, res, next) {
   res.send({
     posts: await Post.find({ author: req.params.id })
@@ -151,7 +169,10 @@ exports.put_comment = async function (req, res, next) {
     }).then(async () => {
       res.send({
         status: 'Comment information updated successfully',
-        comment: await Comment.findById(req.params.id),
+        comment: await Comment.findById(req.params.id).populate(
+          'author',
+          'username profile_picture',
+        ),
       });
     });
   } catch (error) {
