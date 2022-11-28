@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Post = require('../models/Posts');
 const path = require('path');
+const ChatMessage = require('../models/ChatMessage');
 
 exports.get_user_data = async function (req, res, next) {
   res.send(
@@ -8,6 +9,14 @@ exports.get_user_data = async function (req, res, next) {
       googleId: 0,
       admin: 0,
     }),
+  );
+};
+
+exports.get_chat = async function (req, res, next) {
+  res.send(
+    await ChatMessage.find()
+      .sort({ createdAt: 1 })
+      .populate('author', 'username profile_picture'),
   );
 };
 
