@@ -66,14 +66,25 @@ exports.put_friend_request = async function (req, res, next) {
 };
 
 exports.put_accept_friend_request = async function (req, res, next) {
-  await User.findByIdAndUpdate(req.params.id, {
-    $push: { friends_list: req.authData.user._id },
-  });
-  await User.findByIdAndUpdate(req.authData.user._id, {
-    $push: { friends_list: req.params.id },
-    $pull: { friend_requests: req.params.id },
-  });
-  res.send({ user: await User.findById(req.authData.user._id) });
+  const signedUser = await User.findById(req.authData.user._id);
+  if (signedUser.friend_requests.includes(req.params.id)) {
+    await User.findByIdAndUpdate(req.params.id, {
+      $push: { friends_list: req.authData.user._id },
+    });
+    await User.findByIdAndUpdate(req.authData.user._id, {
+      $push: { friends_list: req.params.id },
+      $pull: { friend_requests: req.params.id },
+    });
+    res.send({ user: await User.findById(req.authData.user._id) });
+  } else {
+    await User.findByIdAndUpdate(req.params.id, {
+      $push: { friend_requests: req.authData.user._id },
+    });
+    res.status(200).send({
+      status: 'Friend Request Sent',
+      user: await User.findById(req.authData.user._id),
+    });
+  }
 };
 
 exports.put_remove_friend = async function (req, res, next) {
