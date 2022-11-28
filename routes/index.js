@@ -4,6 +4,7 @@ const {
   get_user_data,
   get_timeline,
   get_image,
+  get_chat,
 } = require('../controllers/index-controllers');
 const { verifyToken } = require('../controllers/jwt-controllers');
 const {
@@ -59,5 +60,47 @@ router.get('/img/:id', get_image);
 router.get('/users', get_users);
 
 router.get('/users/:id', get_user_data);
+
+router.get('/chat', get_chat);
+
+const ChatMessage = require('../models/ChatMessage');
+
+const jwt = require('jsonwebtoken');
+const io = require('socket.io')(3030, {
+  cors: { origin: [process.env.CLIENT] },
+});
+
+io.on('connection', (socket, next) => {
+  const token =
+    socket.handshake.query.Authorization ||
+    socket.handshake.query.authorization ||
+    '';
+  if (!token) {
+    return res.status(401).json({ error: 'Not authorized' });
+  }
+
+  jwt.verify(token, process.env.JWTSECRET, (err, authData) => {
+    if (err) {
+      return res.status(401).json({ error: 'Not authorized' });
+    }
+    socket.on('send-message', (message) => {
+      if (message.message === '') return;
+      const newChatMessage = new ChatMessage({
+        author: authData.user._id,
+        message: message.message,
+      });
+      newChatMessage.save(async (error, value) => {
+        if (error) {
+          return;
+        } else {
+          io.emit(
+            'receive-message',
+            await value.populate('author', 'username profile_picture'),
+          );
+        }
+      });
+    });
+  });
+});
 
 module.exports = router;
