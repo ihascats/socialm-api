@@ -55,9 +55,19 @@ exports.put_friend_request = async function (req, res, next) {
   if (authUser.friend_requests.includes(req.params.id)) {
     res.redirect(`/user/accept_fr/${req.params.id}`);
   } else {
-    await User.findByIdAndUpdate(req.params.id, {
+    const user = await User.findByIdAndUpdate(req.params.id, {
       $push: { friend_requests: req.authData.user._id },
     });
+    if (req.authData.user._id !== `${user._id}`) {
+      await User.findByIdAndUpdate(user._id, {
+        $push: {
+          unread_notifications: {
+            user: authUser._id,
+            friend_request: true,
+          },
+        },
+      });
+    }
     res.status(200).send({
       status: 'Friend Request Sent',
       user: await User.findById(req.authData.user._id),
