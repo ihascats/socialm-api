@@ -238,9 +238,19 @@ exports.put_like = async function (req, res, next) {
       $pull: { likes: req.authData.user._id },
     });
   } else {
-    await Post.findByIdAndUpdate(req.params.id, {
+    const post = await Post.findByIdAndUpdate(req.params.id, {
       $push: { likes: req.authData.user._id },
     });
+    if (req.authData.user._id !== `${post.author}`) {
+      await User.findByIdAndUpdate(post.author, {
+        $push: {
+          unread_notifications: {
+            post: post._id,
+            new_like: true,
+          },
+        },
+      });
+    }
   }
   res.send({ likeCount: (await Post.findById(req.params.id)).likes.length });
 };
@@ -256,9 +266,20 @@ exports.put_comment_like = async function (req, res, next) {
       $pull: { likes: req.authData.user._id },
     });
   } else {
-    await Comment.findByIdAndUpdate(req.params.id, {
+    const comment = await Comment.findByIdAndUpdate(req.params.id, {
       $push: { likes: req.authData.user._id },
     });
+    if (req.authData.user._id !== `${comment.author}`) {
+      await User.findByIdAndUpdate(comment.author, {
+        $push: {
+          unread_notifications: {
+            post: comment.parent._id,
+            comment_text: comment.comment_text,
+            new_like: true,
+          },
+        },
+      });
+    }
   }
   res.send({ likeCount: (await Comment.findById(req.params.id)).likes.length });
 };
@@ -283,9 +304,19 @@ exports.post_comment = async function (req, res, next) {
       if (error) {
         return next(error);
       } else {
-        await Post.findByIdAndUpdate(req.params.id, {
+        const post = await Post.findByIdAndUpdate(req.params.id, {
           $push: { replies: await value._id },
         });
+        if (req.authData.user._id !== `${post.author}`) {
+          await User.findByIdAndUpdate(post.author, {
+            $push: {
+              unread_notifications: {
+                post: post._id,
+                new_comment: true,
+              },
+            },
+          });
+        }
         res.redirect(`/post/${req.params.id}`);
       }
     });
