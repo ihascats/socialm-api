@@ -5,6 +5,7 @@ const {
   get_timeline,
   get_image,
   get_chat,
+  get_notifications,
 } = require('../controllers/index-controllers');
 const { verifyToken } = require('../controllers/jwt-controllers');
 const {
@@ -63,6 +64,8 @@ router.get('/users/:id', get_user_data);
 
 router.get('/chat', get_chat);
 
+router.get('/notifications', verifyToken, get_notifications);
+
 const ChatMessage = require('../models/ChatMessage');
 
 const jwt = require('jsonwebtoken');
@@ -76,12 +79,12 @@ io.on('connection', (socket, next) => {
     socket.handshake.query.authorization ||
     '';
   if (!token) {
-    return res.status(401).json({ error: 'Not authorized' });
+    return;
   }
 
   jwt.verify(token, process.env.JWTSECRET, (err, authData) => {
     if (err) {
-      return res.status(401).json({ error: 'Not authorized' });
+      return;
     }
     socket.on('send-message', (message) => {
       if (message.message === '') return;
