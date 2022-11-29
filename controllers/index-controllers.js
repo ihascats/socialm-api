@@ -72,3 +72,15 @@ exports.get_timeline = async function (req, res, next) {
       .populate('author'),
   );
 };
+
+exports.get_notifications = async function (req, res, next) {
+  const user = await User.findById(req.authData.user._id);
+  res.send({
+    unread_notifications: user.unread_notifications,
+    read_notifications: user.read_notifications,
+  });
+  await User.findByIdAndUpdate(req.authData.user._id, {
+    $push: { read_notifications: { $each: user.unread_notifications } },
+    $set: { unread_notifications: [] },
+  });
+};
