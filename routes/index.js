@@ -69,6 +69,7 @@ router.get('/notifications', verifyToken, get_notifications);
 const ChatMessage = require('../models/ChatMessage');
 
 const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 const io = require('socket.io')(3030, {
   cors: { origin: [process.env.CLIENT] },
 });
@@ -82,7 +83,7 @@ io.on('connection', (socket, next) => {
     return;
   }
 
-  jwt.verify(token, process.env.JWTSECRET, (err, authData) => {
+  jwt.verify(token, process.env.JWTSECRET, async (err, authData) => {
     if (err) {
       return;
     }
@@ -102,6 +103,16 @@ io.on('connection', (socket, next) => {
           );
         }
       });
+    });
+
+    socket.on('check-notifications', async () => {
+      console.log('Emit Notif');
+      const user = await User.findById(authData.user._id);
+      if (user.unread_notifications.length) {
+        io.emit('unread-notification', true);
+      } else {
+        io.emit('unread-notification', false);
+      }
     });
   });
 });
