@@ -94,7 +94,7 @@ io.on('connection', (socket, next) => {
       if (message.message === '') return;
       const newChatMessage = new ChatMessage({
         author: authData.user._id,
-        message: message.message,
+        message: message.message.trim(),
       });
       newChatMessage.save(async (error, value) => {
         if (error) {

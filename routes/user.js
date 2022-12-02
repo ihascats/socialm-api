@@ -33,8 +33,8 @@ router.put('/remove_fr/:id', verifyToken, put_remove_friend);
 router.put(
   '/',
   verifyToken,
-  username_validate,
   upload.single('profile_picture'),
+  username_validate,
   put_auth_user_data,
 );
 

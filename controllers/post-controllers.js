@@ -2,8 +2,27 @@ const Post = require('../models/Posts');
 const Comment = require('../models/Comments');
 const User = require('../models/User');
 const path = require('path');
+const { check, validationResult } = require('express-validator');
+
+exports.comment_validate = [
+  check('comment_text')
+    .isLength({ min: 1 })
+    .withMessage('Username must be at least 2 characters')
+    .trim(),
+];
+
+exports.post_validate = [
+  check('post_text')
+    .isLength({ min: 1 })
+    .withMessage('Username must be at least 2 characters')
+    .trim(),
+];
 
 exports.post_new_post = async (req, res, next) => {
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    return;
+  }
   try {
     let image =
       'file' in req
@@ -124,6 +143,10 @@ exports.delete_post = async function (req, res, next) {
 };
 
 exports.put_post = async function (req, res, next) {
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    return;
+  }
   try {
     let image =
       'file' in req
@@ -155,6 +178,10 @@ exports.put_post = async function (req, res, next) {
 };
 
 exports.put_comment = async function (req, res, next) {
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    return;
+  }
   try {
     let image =
       'file' in req
@@ -285,6 +312,10 @@ exports.put_comment_like = async function (req, res, next) {
 };
 
 exports.post_comment = async function (req, res, next) {
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    return;
+  }
   try {
     let image =
       'file' in req

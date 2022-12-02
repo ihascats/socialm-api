@@ -16,9 +16,17 @@ const {
   put_comment,
   put_comment_like,
   get_comment,
+  comment_validate,
+  post_validate,
 } = require('../controllers/post-controllers');
 
-router.post('/:id/comment', verifyToken, upload.single('image'), post_comment);
+router.post(
+  '/:id/comment',
+  verifyToken,
+  upload.single('image'),
+  comment_validate,
+  post_comment,
+);
 
 router.get('/comment/:id', get_comment);
 
@@ -35,11 +43,18 @@ router.put(
   '/comment/:id',
   verifyToken,
   upload.single('image'),
+  comment_validate,
   comment_permission_check,
   put_comment,
 );
 
-router.post('/', verifyToken, upload.single('image'), post_new_post);
+router.post(
+  '/',
+  verifyToken,
+  upload.single('image'),
+  post_validate,
+  post_new_post,
+);
 
 router.get('/user/:id', get_user_posts_comments);
 
@@ -51,6 +66,7 @@ router.put(
   '/:id',
   verifyToken,
   upload.single('image'),
+  post_validate,
   post_permission_check,
   put_post,
 );
