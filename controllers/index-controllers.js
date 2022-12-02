@@ -84,3 +84,13 @@ exports.get_notifications = async function (req, res, next) {
     $set: { unread_notifications: [] },
   });
 };
+
+exports.put_clear_notifications = async function (req, res, next) {
+  const updatedUser = await User.findByIdAndUpdate(req.authData.user._id, {
+    $set: { unread_notifications: [], read_notifications: [] },
+  });
+  res.send({
+    unread_notifications: [],
+    read_notifications: [updatedUser.read_notifications],
+  });
+};
