@@ -6,6 +6,7 @@ const {
   get_image,
   get_chat,
   get_notifications,
+  put_clear_notifications,
 } = require('../controllers/index-controllers');
 const { verifyToken } = require('../controllers/jwt-controllers');
 const {
@@ -66,6 +67,8 @@ router.get('/chat', get_chat);
 
 router.get('/notifications', verifyToken, get_notifications);
 
+router.put('/notifications', verifyToken, put_clear_notifications);
+
 const ChatMessage = require('../models/ChatMessage');
 
 const jwt = require('jsonwebtoken');
@@ -106,12 +109,11 @@ io.on('connection', (socket, next) => {
     });
 
     socket.on('check-notifications', async () => {
-      console.log('Emit Notif');
       const user = await User.findById(authData.user._id);
       if (user.unread_notifications.length) {
-        io.emit('unread-notification', true);
+        io.to(socket.id).emit('unread-notification', true);
       } else {
-        io.emit('unread-notification', false);
+        io.to(socket.id).emit('unread-notification', false);
       }
     });
   });
