@@ -27,6 +27,45 @@ mongoose.connect(
   (err) => {
     if (!err) {
       console.log('MongoDB Connection Succeeded.');
+      const testFolder = './public/images';
+      const fs = require('fs');
+      const Users = require('./models/User');
+      const Posts = require('./models/Posts');
+      const Comments = require('./models/Comments');
+      const path = require('path');
+
+      fs.readdir(testFolder, (err, files) => {
+        const images = files.filter((file) => {
+          if (file !== 'no-image.png') return file;
+        });
+        images.forEach(async (image) => {
+          const userProfilePicture = await Users.find({
+            profile_picture: image,
+          });
+          const postImage = await Posts.find({ image });
+          const commentImage = await Comments.find({ image });
+          if (
+            !userProfilePicture.length &&
+            !postImage.length &&
+            !commentImage.length
+          ) {
+            console.log(image);
+            const deletePath = path.join(
+              __dirname,
+              '.',
+              'public',
+              'images',
+              image,
+            );
+            fs.unlink(deletePath, (err) => {
+              if (err) {
+                throw err;
+              }
+              console.log('Delete File successfully.');
+            });
+          }
+        });
+      });
     } else {
       console.log('Error in DB connection: ' + err);
     }
