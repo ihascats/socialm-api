@@ -1,5 +1,5 @@
 const User = require('../models/User');
-const { check } = require('express-validator');
+const { check, validationResult } = require('express-validator');
 
 exports.username_validate = [
   check('username')
@@ -16,6 +16,10 @@ exports.get_auth_user_data = async function (req, res, next) {
 };
 
 exports.put_auth_user_data = async function (req, res, next) {
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    return;
+  }
   let image =
     'file' in req
       ? req.file.filename
