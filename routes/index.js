@@ -7,6 +7,7 @@ const {
   get_chat,
   get_notifications,
   put_clear_notifications,
+  get_connection_status,
 } = require('../controllers/index-controllers');
 const { verifyToken } = require('../controllers/jwt-controllers');
 const {
@@ -64,6 +65,8 @@ router.get('/users', get_users);
 router.get('/users/:id', get_user_data);
 
 router.get('/chat', get_chat);
+
+router.get('/connection', get_connection_status);
 
 router.get('/notifications', verifyToken, get_notifications);
 

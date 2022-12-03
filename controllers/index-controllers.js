@@ -3,6 +3,15 @@ const Post = require('../models/Posts');
 const path = require('path');
 const ChatMessage = require('../models/ChatMessage');
 
+exports.get_connection_status = async function (req, res, next) {
+  const mongoConnected = await User.findById('6385ebaa598c0f0fcf384f2f');
+  if (mongoConnected) {
+    setTimeout(() => {
+      res.send({ connected: true });
+    }, 2000);
+  }
+};
+
 exports.get_user_data = async function (req, res, next) {
   res.send(
     await User.findById(req.params.id, {
