@@ -16,58 +16,6 @@ const postRouter = require('./routes/post');
 const app = express();
 app.use(cors());
 
-const ChatMessage = require('./models/ChatMessage');
-
-const jwt = require('jsonwebtoken');
-const httpServer = require('http').createServer(app);
-const io = require('socket.io')(httpServer, {
-  cors: { origin: [process.env.CLIENT] },
-});
-
-io.on('connection', (socket, next) => {
-  const token =
-    socket.handshake.query.Authorization ||
-    socket.handshake.query.authorization ||
-    '';
-  if (!token) {
-    return;
-  }
-
-  jwt.verify(token, process.env.JWTSECRET, async (err, authData) => {
-    if (err) {
-      return;
-    }
-    socket.on('send-message', (message) => {
-      if (message.message === '') return;
-      const newChatMessage = new ChatMessage({
-        author: authData.user._id,
-        message: message.message.trim(),
-      });
-      newChatMessage.save(async (error, value) => {
-        if (error) {
-          return;
-        } else {
-          io.emit(
-            'receive-message',
-            await value.populate('author', 'username profile_picture'),
-          );
-        }
-      });
-    });
-
-    socket.on('check-notifications', async () => {
-      const user = await User.findById(authData.user._id);
-      if (user.unread_notifications.length) {
-        io.to(socket.id).emit('unread-notification', true);
-      } else {
-        io.to(socket.id).emit('unread-notification', false);
-      }
-    });
-  });
-});
-
-httpServer.listen(3030);
-
 require('dotenv').config();
 const mongoose = require('mongoose');
 

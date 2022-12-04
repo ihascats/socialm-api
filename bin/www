@@ -29,6 +29,55 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
+const ChatMessage = require('../models/ChatMessage');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+const io = require('socket.io')(server, {
+  cors: { origin: [process.env.CLIENT] },
+});
+
+io.on('connection', (socket, next) => {
+  const token =
+    socket.handshake.query.Authorization ||
+    socket.handshake.query.authorization ||
+    '';
+  if (!token) {
+    return;
+  }
+
+  jwt.verify(token, process.env.JWTSECRET, async (err, authData) => {
+    if (err) {
+      return;
+    }
+    socket.on('send-message', (message) => {
+      if (message.message === '') return;
+      const newChatMessage = new ChatMessage({
+        author: authData.user._id,
+        message: message.message.trim(),
+      });
+      newChatMessage.save(async (error, value) => {
+        if (error) {
+          return;
+        } else {
+          io.emit(
+            'receive-message',
+            await value.populate('author', 'username profile_picture'),
+          );
+        }
+      });
+    });
+
+    socket.on('check-notifications', async () => {
+      const user = await User.findById(authData.user._id);
+      if (user.unread_notifications.length) {
+        io.to(socket.id).emit('unread-notification', true);
+      } else {
+        io.to(socket.id).emit('unread-notification', false);
+      }
+    });
+  });
+});
+
 /**
  * Normalize a port into a number, string, or false.
  */
@@ -58,9 +107,7 @@ function onError(error) {
     throw error;
   }
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+  var bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
@@ -83,8 +130,6 @@ function onError(error) {
 
 function onListening() {
   var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
+  var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }
