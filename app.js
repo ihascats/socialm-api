@@ -79,7 +79,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: 'http://localhost:3000/auth/success',
+      callbackURL: `/auth/success`,
     },
     async function (accessToken, refreshToken, profile, done) {
       // Wouldn't have been able to make it work without https://github.com/DoviMaj/fakebook-server
